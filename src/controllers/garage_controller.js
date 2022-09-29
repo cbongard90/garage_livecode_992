@@ -14,6 +14,8 @@ export default class extends Controller {
     .then((data) => {
       console.log(data);
 
+      // Clean the car List
+      this.carsListTarget.innerHTML = ""
       // Iterate over the data with a forEach
       data.forEach(car => {
         this.#insertCarCard(car)
@@ -35,5 +37,36 @@ export default class extends Controller {
         </div>
         `
     this.carsListTarget.insertAdjacentHTML('beforeend', carCard)
+  }
+
+  createCar(event) {
+    event.preventDefault();
+    // get the userdata
+    const formData = new FormData(event.currentTarget)
+    const newCar = Object.fromEntries(formData)
+
+    fetch(this.garageUrl, {
+      method: "POST",
+      headers: {"Content-Type" : "application/json"},
+      body: JSON.stringify(newCar)
+    })
+    .then(() => {
+      this.#refreshCarCards()
+    })
+    event.currentTarget.reset()
+  }
+
+  #refreshCarCards() {
+    fetch(this.garageUrl)
+      .then(response => response.json())
+      .then((data) => {
+        console.log(data);
+        // Clean the car List
+        this.carsListTarget.innerHTML = ""
+        // Iterate over the data with a forEach
+        data.forEach(car => {
+          this.#insertCarCard(car)
+        });
+      })
   }
 }
